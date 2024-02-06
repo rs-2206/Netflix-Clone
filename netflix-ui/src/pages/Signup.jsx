@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { firebaseAuth} from "../utils/firebase-config";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 import styled from "styled-components";
 import BackgroundImage from "../components/BackgroundImage";
 import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -15,11 +16,16 @@ export default function Signup() {
     try {
       const { email, password} = formValues;
       await createUserWithEmailAndPassword(firebaseAuth, email, password);
-    } catch(err) {
-      console.log(err)
+    } catch(error) {
+      console.log(error);
     }
   };
-  return <Container showPassword = {showPassword}>
+
+  // onAuthStateChanged(firebaseAuth, (currentUser) => {
+  //   if(currentUser) Navigate("/");
+  // })
+  return (
+    <Container showPassword = {showPassword}>
     <BackgroundImage/>
     <div className="content">
       <Header login/>
@@ -32,7 +38,7 @@ export default function Signup() {
           <div className="form">
             <input 
             type = "email" 
-            placeholder="Email Address" 
+            placeholder="Email address" 
             name = "email" 
             value = {formValues.email}
             onChange = {(e) =>
@@ -41,9 +47,9 @@ export default function Signup() {
                 [e.target.name]: e.target.value,
               })
             }
-                />
+            />
             {
-              showPassword ? (
+              showPassword && (
                 <input 
                 type = "password" 
                 placeholder="Password" 
@@ -55,20 +61,19 @@ export default function Signup() {
                   [e.target.name]: e.target.value,
               })
             }
-                />
-              ) : <button onClick = {() => setShowPassword(true)}>Get Started</button>
-            }
-            {/* {
-              !showPassword && <button onClick = {() => setShowPassword(true)}>Get Started</button>
-            } */}
+            />
+              )}
+             {
+              !showPassword && (
+              <button onClick = {() => setShowPassword(true)}>Get Started</button>
+            )}
             
         </div>
-        <button onClick = {handleSignIn}>
-          Sign Up
-        </button>
+        {showPassword && <button onClick={handleSignIn}>Log In</button>}
       </div>
-      </div>
+    </div>
   </Container>
+   );
 }
 
 const Container = styled.div`
